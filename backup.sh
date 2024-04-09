@@ -24,7 +24,7 @@ else
    mkdir -p ${BACKUP_DST_DIR}
    mv "$COMPARE_DST_FULL_PATH" "$BACKUP_DST_FULL_PATH"
    #echo "archive created, uploading..."
-   /usr/bin/aws s3 sync ${BACKUP_TGT_DIR} s3://${BACKUP_S3_BUCKET}
+   /usr/bin/aws s3 sync ${BACKUP_TGT_DIR} s3://${BACKUP_S3_BUCKET} --region ${AWS_DEFAULT_REGION}
 fi
 
 
