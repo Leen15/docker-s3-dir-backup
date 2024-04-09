@@ -13,7 +13,7 @@ eval "export COMPARE_DST_FULL_PATH=${COMPARE_DIR}${BACKUP_FILE_NAME}.tar.gz"
 BACKUP_DST_DIR=$(dirname "${BACKUP_DST_FULL_PATH}")
 
 mkdir -p ${COMPARE_DIR}
-echo "Gzipping ${BACKUP_SRC_DIR} into ${COMPARE_DST_FULL_PATH}" 
+echo "Gzipping ${BACKUP_SRC_DIR} into ${COMPARE_DST_FULL_PATH}"
 tar -czf ${COMPARE_DST_FULL_PATH} --exclude-tag-all=exclude_dir_from_backup -C ${BACKUP_SRC_DIR} .
 
 if cmp -s -i 8 "$BACKUP_DST_FULL_PATH" "$COMPARE_DST_FULL_PATH"
@@ -24,7 +24,7 @@ else
    mkdir -p ${BACKUP_DST_DIR}
    mv "$COMPARE_DST_FULL_PATH" "$BACKUP_DST_FULL_PATH"
    #echo "archive created, uploading..."
-   /usr/bin/aws s3 sync ${BACKUP_TGT_DIR} s3://${BACKUP_S3_BUCKET} --region ${AWS_DEFAULT_REGION}
+   /usr/local/bin/aws s3 sync ${BACKUP_TGT_DIR} s3://${BACKUP_S3_BUCKET} --region ${AWS_DEFAULT_REGION}
 fi
 
 

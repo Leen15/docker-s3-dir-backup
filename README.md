@@ -4,10 +4,6 @@ This avoids to upload multiple backups that are all equals.
 
 You can also exclude one or more directories from the backup just adding an empty file `exclude_dir_from_backup` inside every directory.
 
-Image runs as a cron job by default evey minute. Period may be changed by tuning `BACKUP_CRON_SCHEDULE` environment variable.
-
-May also be run as a one time backup job by using `backup.sh` script as command.
-
 Following environemnt variables should be set for backup to work:
 ```
 BACKUP_S3_BUCKET=		// no trailing slash at the end!
@@ -27,7 +23,7 @@ Flowing environment variables can be set to change the functionality:
 BACKUP_CRON_SCHEDULE=* * * * *
 BACKUP_TGT_DIR=/backup/		// always with trailing slash at the end!
 BACKUP_SRC_DIR=/data/		// always with trailing slash at the end!
-BACKUP_FILE_NAME=host_volumes
+BACKUP_FILE_NAME=backup
 ```
 ## Usage
 ### Backup
@@ -38,14 +34,9 @@ If you want to store files on S3 under a subdirectory, just add it to the `BACKU
 
 #### Examples
 
-Mount the dir you want to be backed up on `BACKUP_SRC_DIR` and run image as daemon for periodic backup:
+Mount the dir you want to be backed up on `BACKUP_SRC_DIR` and run image for one time backup (using default values and not keeping the backup archive):
 ```
-$ docker run -d -e BACKUP_S3_BUCKET=bucket/directory -e AWS_DEFAULT_REGION=aws-region -e AWS_ACCESS_KEY_ID=awsid -e AWS_SECRET_ACCESS_KEY=awskey -v /dir/to/be/backedup/:/data/ mohamnag/s3-dir-backup
-```
-
-or for one time backup (using default values and not keeping the backup archive):
-```
-$ docker run --rm -e BACKUP_S3_BUCKET=bucket/directory -e AWS_DEFAULT_REGION=aws-region -e AWS_ACCESS_KEY_ID=awsid -e AWS_SECRET_ACCESS_KEY=awskey -v /dir/to/be/backedup/:/data/ mohamnag/s3-dir-backup /opt/backup.sh
+$ docker run --rm -e BACKUP_S3_BUCKET=bucket/directory -e AWS_DEFAULT_REGION=aws-region -e AWS_ACCESS_KEY_ID=awsid -e AWS_SECRET_ACCESS_KEY=awskey -v /dir/to/be/backedup/:/data/ leen15/docker-s3-dir-backup
 ```
 
 ### Restore
@@ -65,25 +56,24 @@ Works exactly like auto restore but container will stop after restoring and ther
 If you know the file path of backup (relative to `BACKUP_S3_BUCKET`) you can use this functionality to restore that specific status. Container will stop after restoring and there will be no future backups.
 
 #### Examples
-To run any of the restore tasks, proper environment variables shall be set and `/opt/restore.sh` shall be run as command. 
+To run any of the restore tasks, proper environment variables shall be set and `/opt/restore.sh` shall be run as command.
 
 Restore an specific backup and exit:
 ```
-$ docker run --rm -e BACKUP_S3_BUCKET=bucket/directory -e AWS_DEFAULT_REGION=aws-region -e AWS_ACCESS_KEY_ID=awsid -e AWS_SECRET_ACCESS_KEY=awskey -e RESTORE_FILE_PATH=2016-02-23/2016-02-23-12-00-01.tar.gz -v /dir/to/be/restored/:/data/ mohamnag/s3-dir-backup /opt/restore.sh
+$ docker run --rm -e BACKUP_S3_BUCKET=bucket/directory -e AWS_DEFAULT_REGION=aws-region -e AWS_ACCESS_KEY_ID=awsid -e AWS_SECRET_ACCESS_KEY=awskey -e RESTORE_FILE_PATH=2016-02-23/2016-02-23-12-00-01.tar.gz -v /dir/to/be/restored/:/data/ --entrypoint /opt/restore.sh leen15/docker-s3-dir-backup
 ```
 
 Restore latest backup and exit:
 ```
-$ docker run --rm -e BACKUP_S3_BUCKET=bucket/directory -e AWS_DEFAULT_REGION=aws-region -e AWS_ACCESS_KEY_ID=awsid -e AWS_SECRET_ACCESS_KEY=awskey -v /dir/to/be/restored/:/data/ mohamnag/s3-dir-backup /opt/restore.sh
+$ docker run --rm -e BACKUP_S3_BUCKET=bucket/directory -e AWS_DEFAULT_REGION=aws-region -e AWS_ACCESS_KEY_ID=awsid -e AWS_SECRET_ACCESS_KEY=awskey -v /dir/to/be/restored/:/data/ --entrypoint /opt/restore.sh leen15/docker-s3-dir-backup
 ```
 
 Restoring an specific backup and start scheduled backup:
 ```
-$ docker run -d -e BACKUP_S3_BUCKET=bucket/directory -e AWS_DEFAULT_REGION=aws-region -e AWS_ACCESS_KEY_ID=awsid -e AWS_SECRET_ACCESS_KEY=awskey -e RESTORE_FILE_PATH=2016-02-23/2016-02-23-12-00-01.tar.gz -e RESTORE_RESUME_BACKUP=1 -v /dir/to/be/restored/:/data/ mohamnag/s3-dir-backup /opt/restore.sh
+$ docker run -d -e BACKUP_S3_BUCKET=bucket/directory -e AWS_DEFAULT_REGION=aws-region -e AWS_ACCESS_KEY_ID=awsid -e AWS_SECRET_ACCESS_KEY=awskey -e RESTORE_FILE_PATH=2016-02-23/2016-02-23-12-00-01.tar.gz -e RESTORE_RESUME_BACKUP=1 -v /dir/to/be/restored/:/data/ --entrypoint /opt/restore.sh leen15/docker-s3-dir-backup
 ```
 
 Restoring latest and starting scheduled backup:
 ```
-$ docker run -d -e BACKUP_S3_BUCKET=bucket/directory -e AWS_DEFAULT_REGION=aws-region -e AWS_ACCESS_KEY_ID=awsid -e AWS_SECRET_ACCESS_KEY=awskey -e RESTORE_RESUME_BACKUP=1 -v /dir/to/be/restored/:/data/ mohamnag/s3-dir-backup /opt/restore.sh
+$ docker run -d -e BACKUP_S3_BUCKET=bucket/directory -e AWS_DEFAULT_REGION=aws-region -e AWS_ACCESS_KEY_ID=awsid -e AWS_SECRET_ACCESS_KEY=awskey -e RESTORE_RESUME_BACKUP=1 -v /dir/to/be/restored/:/data/ --entrypoint /opt/restore.sh leen15/docker-s3-dir-backup
 ```
-
