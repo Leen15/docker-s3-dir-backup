@@ -20,7 +20,6 @@ RESTORE_FILE_PATH=
 
 Flowing environment variables can be set to change the functionality:
 ```
-BACKUP_CRON_SCHEDULE=* * * * *
 BACKUP_TGT_DIR=/backup/		// always with trailing slash at the end!
 BACKUP_SRC_DIR=/data/		// always with trailing slash at the end!
 BACKUP_FILE_NAME=backup
@@ -45,7 +44,7 @@ Restoring a backup from S3 bucket can be done independently or in combination wi
 > Latest backup is considered the newest file inside `BACKUP_S3_BUCKET` and its subdirectories with a `*.gz` extension.
 
 #### Restore and backup
-This functionality will find the latest backup and restore it on `BACKUP_SRC_DIR`. It will then start the backup cron job. This is mainly intended for environments where the backed up directory may move between machines.
+This functionality will find the latest backup and restore it on `BACKUP_SRC_DIR`. This is mainly intended for environments where the backed up directory may move between machines.
 
 Imagine you are backing up the data directory of a docker container running a database. If an automatic process (like ECS scheduler) stops the database container and starts is on a new machine, you dont want to have an empty database. In this case this image will restore the last backed up status of database and will also backu it up in future when new changes have happened.
 
