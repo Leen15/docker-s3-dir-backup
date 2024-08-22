@@ -20,5 +20,5 @@ jobs:
       - name: build and push the image
         run: |
           docker buildx build --push \
-            --tag leen15/docker-s3-dir-backup:latest \
+            --tag leen15/docker-s3-dir-backup:multiarch \
             --platform linux/amd64,linux/arm64 .
